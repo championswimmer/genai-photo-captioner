@@ -1,4 +1,7 @@
-
+import { getResizedBase64 } from './browser/resize.browser';
+import { getPhotoExif } from './browser/exif.browser';
+import { generatePhotoAttachments, Models, Providers, SystemMessage } from './llm';
+import { Photo } from './types';
 
 document.getElementById('imageInput')?.addEventListener('change', function (event) {
   const container = document.getElementById('imagePreviewContainer')!
@@ -32,4 +35,56 @@ document.getElementById('imageInput')?.addEventListener('change', function (even
       container.appendChild(col)
     }
   }
-})
+});
+
+document.getElementById('generateCaptionButton')?.addEventListener('click', async function () {
+  const files = (document.getElementById('imageInput') as HTMLInputElement).files!;
+  const photos: Photo[] = [];
+
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    const [base64, exif] = await Promise.all([
+      getResizedBase64(file, 300),
+      getPhotoExif(file)
+    ]);
+
+    photos.push({
+      base64,
+      exif: {
+        camera: {
+          make: exif?.Image?.Make,
+          model: exif?.Image?.Model
+        },
+        gps: {
+          latitude: exif?.GPSInfo?.GPSDestLatitudeRef,
+          longitude: exif?.GPSInfo?.GPSDestLongitudeRef
+        },
+        image: {
+          iso: exif?.Photo?.ISOSpeed,
+          aperture: exif?.Photo?.FNumber,
+          exposure: exif?.Photo?.ExposureTime,
+          focalLength: exif?.Photo?.FocalLength
+        }
+      }
+    });
+  }
+
+  const photoAttachments = generatePhotoAttachments(photos);
+
+  const llm = Providers.OpenAI;
+  const response = await llm.chat.completions.create({
+    model: Models.OpenAI.GPT4o,
+    max_tokens: 500,
+    temperature: 0.8,
+    messages: [
+      SystemMessage,
+      photoAttachments
+    ]
+  });
+
+  const caption = response.choices[0]?.message?.content || '';
+  const captionDisplay = document.getElementById('captionDisplay');
+  if (captionDisplay) {
+    captionDisplay.innerHTML = `<div>${caption}</div>`;
+  }
+});
