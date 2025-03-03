@@ -1,0 +1,27 @@
+{
+  "name": "genai-photo-captioner",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "bun --watch src/main.ts",
+    "build": "bun build src/main.ts --outdir ./dist --target bun",
+    "build:exe": "bun build src/main.ts --outfile ./dist/main.exe --compile --target bun",
+    "build:web": "bun build src/main.ts --outdir ./dist  --target browser --minify",
+    "build:tsc": "bun --exec tsc",
+    "start": "bun run src/main.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "exif-reader": "^2.0.2",
+    "openai": "^4.86.1",
+    "pica": "^9.0.1",
+    "sharp": "^0.33.5",
+    "typescript": "^5.8.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.8",
+    "@types/pica": "^9.0.5"
+  }
+}
