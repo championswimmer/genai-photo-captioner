@@ -8,7 +8,7 @@ export interface ExifData {
     longitude?: string
   }
   image: {
-    iso?: number
+    iso?: string
     aperture?: number
     exposure?: number
     focalLength?: number

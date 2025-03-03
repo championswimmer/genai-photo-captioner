@@ -31,7 +31,7 @@ export async function getPhotosFromFolder(folderPath: string, size: number = 300
               longitude: exif?.GPSInfo?.GPSDestLongitudeRef
             },
             image: {
-              iso: exif?.Photo?.ISOSpeed,
+              iso: exif?.Photo?.ISOSpeed?.toString(),
               aperture: exif?.Photo?.FNumber,
               exposure: exif?.Photo?.ExposureTime,
               focalLength: exif?.Photo?.FocalLength

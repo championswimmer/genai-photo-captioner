@@ -1,4 +1,4 @@
-import pica from 'pica';
+// import pica from 'pica';
 
 export async function getResizedBase64(file: File, size: number): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -38,7 +38,7 @@ export async function getResizedBase64(file: File, size: number): Promise<string
         canvas.width = width;
         canvas.height = height;
 
-        const picaInstance = pica();
+        const picaInstance = window.pica();
         const resizeResult = await picaInstance.resize(img, canvas, {
           unsharpAmount: 80,
           unsharpRadius: 0.6,

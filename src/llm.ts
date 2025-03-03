@@ -1,19 +1,36 @@
-import OpenAI from 'openai' 
+import OpenAI from 'openai'
 import { ChatCompletionContentPartImage, ChatCompletionContentPartText, ChatCompletionMessageParam, ChatCompletionSystemMessageParam } from 'openai/resources'
 import { Photo } from 'types'
 
+let dangerouslyAllowBrowser: boolean = false
+
+if (globalThis.process === undefined) {
+  // @ts-ignore
+  globalThis.process = { env: {} }
+  dangerouslyAllowBrowser = true
+}
+
 export const Providers = {
-  OpenAI: new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-  }),
-  Anthropic: new OpenAI({
-    apiKey: process.env.ANTHROPIC_API_KEY,
-    baseURL: "https://api.anthropic.com/v1/"
-  }),
-  xAI: new OpenAI({
-    apiKey: process.env.XAI_API_KEY,
-    baseURL: "https://api.x.ai/v1"
-  })
+  get OpenAI() {
+    return new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+      dangerouslyAllowBrowser
+    })
+  },
+  get Anthropic() {
+    return new OpenAI({
+      apiKey: process.env.ANTHROPIC_API_KEY,
+      baseURL: "https://api.anthropic.com/v1/",
+      dangerouslyAllowBrowser
+    })
+  },
+  get xAI() {
+    return new OpenAI({
+      apiKey: process.env.XAI_API_KEY,
+      baseURL: "https://api.x.ai/v1",
+      dangerouslyAllowBrowser
+    })
+  }
 }
 
 export const Models = {
@@ -33,11 +50,17 @@ export const SystemMessage: ChatCompletionSystemMessageParam = {
   role: "system",
   content: `
     You are a social media expert who knows how to give catchy captions to posts including photos.
-    The images uploaded to you are followed by their EXIF data.
-    Do **NOT** print the exact latiatude/longitude data in the captions.
+    Each image uploaded to you is followed by their EXIF data.
+    
     If GPS data is present you **MUST** include a story about the city and country of the location.
+    If camera data is present add some hashtags about the phone or camera used.
+
     Generate only a single caption for the entire set of photos.
     The caption can be between 100-200 words long.
+
+    Tone: Informative and Serious
+
+    Do **NOT** print the exact latiatude/longitude data in the captions.
   `,
 }
 
@@ -59,5 +82,3 @@ export function generatePhotoAttachments(photos: Photo[]): ChatCompletionMessage
     ])).flat()
   })
 }
-
-export { Providers, Models, SystemMessage, generatePhotoAttachments }
