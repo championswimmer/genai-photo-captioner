@@ -6,7 +6,7 @@
     "dev": "bun --watch src/main.ts",
     "build": "bun build src/main.ts --outdir ./dist --target bun",
     "build:exe": "bun build src/main.ts --outfile ./dist/main.exe --compile --target bun",
-    "build:web": "bun build src/main.ts --outdir ./dist  --target browser --minify",
+    "build:web": "bun build src/index.html --outdir ./dist/html  --target browser --minify",
     "build:tsc": "bun --exec tsc",
     "start": "bun run src/main.ts"
   },
